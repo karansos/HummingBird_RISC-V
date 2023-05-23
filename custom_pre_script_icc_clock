@@ -1,0 +1,1 @@
+set_clock_tree_exceptions -stop_pins [get_ports {ppi_lpm_if_clk ppi_re_if_clk ppi_sw_if_clk}]

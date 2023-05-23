@@ -1,0 +1,539 @@
+puts "RM-Info: Running script [info script]\n"
+
+##########################################################################################
+# Variables common to all reference methodology scripts
+# Script: common_setup.tcl
+# Version: CHANGE ME SNPS should give this
+# Copyright Synopsys, Inc. All rights reserved.
+##########################################################################################
+
+set USER                          [getenv "USER"]
+
+set LIB_DIR                       "../../lib/"
+
+set TCL_DIR                       "$LIB_DIR/tcl/"
+
+set FP_DIR                        "$LIB_DIR/fp/"
+
+set NETLIST_DIR                   "$LIB_DIR/netlist/"
+
+set ASTRO_DIR                     "$LIB_DIR/astro/"
+
+set MAP_DIR                       "$LIB_DIR/map/"
+
+set SYNOPSYS_DIR                  "$LIB_DIR/synopsys/"
+
+set STARRC_DIR                    "$LIB_DIR/starRc/"
+
+set TLUPLUS_DIR                   "$LIB_DIR/tluplus/"
+
+set EM_DIR                        "$LIB_DIR/alf/"
+
+set DESIGN_NAME                   "changeme"  ;#  The name of the top-level design
+#                                                              CHANGE_ME/CHANGE_ME/CHANGE_ME = DESIGN_NAME/SVN_TAG_NAME/PNR_TAG
+set DESIGN_REF_DATA_PATH          ""  ;#  Absolute path prefix variable for library/design data.
+                                       #  Use this variable to prefix the common absolute path  
+                                       #  to the common variables defined below.
+                                       #  Absolute paths are mandatory for hierarchical 
+                                       #  reference methodology flow.
+
+##########################################################################################
+# Hierarchical Flow Design Variables
+##########################################################################################
+
+set HIERARCHICAL_DESIGNS           "" ;# List of hierarchical block design names "DesignA DesignB" ...
+set HIERARCHICAL_CELLS             "" ;# List of hierarchical block cell instance names "u_DesignA u_DesignB" ...
+
+##########################################################################################
+# Library Setup Variables
+##########################################################################################
+
+# For the following variables, use a blank space to separate multiple entries.
+# Example: set TARGET_LIBRARY_FILES "lib1.db lib2.db lib3.db"
+
+set ADDITIONAL_SEARCH_PATH        "$SYNOPSYS_DIR \
+                                  "  ;#  Additional search path to be added to the default search path
+
+# Populate TARGET_LIBRARY_FILES and ADDITIONAL_LINK_LIB_FILES variables from $DESIGN_NAME.libraries file
+# in the syn/DESIGN_NAME/to_pnr directory.
+set TARGET_LIBRARY_FILES          " \
+                tcbn28hpcplusbwp12t30p140lvtssg0p81v125c_ccs.db \
+                tcbn28hpcplusbwp12t30p140hvtssg0p81v125c_ccs.db \
+                tcbn28hpcplusbwp12t30p140ssg0p81v125c_ccs.db \
+                tcbn28hpcplusbwp12t30p140lvtssg0p81vm40c_ccs.db \
+                tcbn28hpcplusbwp12t30p140hvtssg0p81vm40c_ccs.db \
+                tcbn28hpcplusbwp12t30p140ssg0p81vm40c_ccs.db \
+                tcbn28hpcplusbwp12t30p140hvtffg0p99vm40c_ccs.db \
+                tcbn28hpcplusbwp12t30p140lvtffg0p99vm40c_ccs.db \
+                tcbn28hpcplusbwp12t30p140ffg0p99vm40c_ccs.db \
+                              "  ;#  Target technology logical libraries
+set TARGET_PR_LIBRARY_FILES " \
+                tcbn28hpcplusbwp12t30p140hvtffg0p99v125c_ccs.db \
+                tcbn28hpcplusbwp12t30p140lvtffg0p99v125c_ccs.db \
+                tcbn28hpcplusbwp12t30p140ffg0p99v125c_ccs.db \
+                "                  
+set ADDITIONAL_LINK_LIB_FILES     " \
+tcbn28hpcplusbwp12t30p140lvtssg0p81v125c_ccs.db \
+tcbn28hpcplusbwp12t30p140ssg0p81v125c_ccs.db \
+\
+tcbn28hpcplusbwp12t30p140hvtssg0p81vm40c_ccs.db \
+tcbn28hpcplusbwp12t30p140lvtssg0p81vm40c_ccs.db \
+tcbn28hpcplusbwp12t30p140ssg0p81vm40c_ccs.db \
+\
+tcbn28hpcplusbwp12t30p140hvtffg0p99v125c_ccs.db \
+tcbn28hpcplusbwp12t30p140lvtffg0p99v125c_ccs.db \
+tcbn28hpcplusbwp12t30p140ffg0p99v125c_ccs.db \
+\
+tcbn28hpcplusbwp12t30p140hvtffg0p99vm40c_ccs.db \
+tcbn28hpcplusbwp12t30p140lvtffg0p99vm40c_ccs.db \
+tcbn28hpcplusbwp12t30p140ffg0p99vm40c_ccs.db \
+\
+tef28hpcp128x32hd18_phrm_130a_ffg0p99v1p98v0c.db \   
+tef28hpcp128x32hd18_phrm_130a_ssg0p81v1p62v125c.db \
+tef28hpcp128x32hd18_phrm_130a_ffg0p99v1p98v125c.db \ 
+tef28hpcp128x32hd18_phrm_130a_ssg0p81v1p62vm40c.db \
+tef28hpcp128x32hd18_phrm_130a_ffg0p99v1p98vm40c.db \ 
+tef28hpcp128x32hd18_phrm_130a_ssg0p9v1p62v0c.db \
+tef28hpcp128x32hd18_phrm_130a_ffg1p05v1p98v0c.db \   
+tef28hpcp128x32hd18_phrm_130a_ssg0p9v1p62v125c.db \
+tef28hpcp128x32hd18_phrm_130a_ffg1p05v1p98v125c.db \ 
+tef28hpcp128x32hd18_phrm_130a_ssg0p9v1p62vm40c.db \
+tef28hpcp128x32hd18_phrm_130a_ffg1p05v1p98vm40c.db \ 
+tef28hpcp128x32hd18_phrm_130a_tt0p9v1p8v25c.db \
+tef28hpcp128x32hd18_phrm_130a_ssg0p72v1p62v0c.db \   
+tef28hpcp128x32hd18_phrm_130a_tt0p9v1p8v85c.db \
+tef28hpcp128x32hd18_phrm_130a_ssg0p72v1p62v125c.db \ 
+tef28hpcp128x32hd18_phrm_130a_tt1v1p8v25c.db \
+tef28hpcp128x32hd18_phrm_130a_ssg0p72v1p62vm40c.db \ 
+tef28hpcp128x32hd18_phrm_130a_tt1v1p8v85c.db \
+tef28hpcp128x32hd18_phrm_130a_ssg0p81v1p62v0c.db \
+tef28hpcp32x32hd18_phrm_120a_ffg0p99v1p98vm40c.db \
+tef28hpcp256x32hd18_phrm_120a_ssg0p81v1p62vm40c.db \
+tef28hpcp32x32hd18_phrm_120a_ssg0p81v1p62v0c.db \
+tef28hpcp32x32hd18_phrm_120a_ffg0p99v1p98v0c.db \
+tef28hpcp256x32hd18_phrm_120a_tt0p9v1p8v25c.db \
+tef28hpcp256x32hd18_phrm_120a_tt0p9v1p8v85c.db \
+tef28hpcp32x32hd18_phrm_120a_ffg0p99v1p98v125c.db \
+tef28hpcp256x32hd18_phrm_120a_ssg0p81v1p62v125c.db \
+tef28hpcp16x32hd18_phrm_130a_ffg0p99v1p98v0c.db \
+tef28hpcp32x32hd18_phrm_120a_ssg0p81v1p62v125c.db \
+tef28hpcp16x32hd18_phrm_130a_ffg0p99v1p98v125c.db \
+tef28hpcp32x32hd18_phrm_120a_ssg0p81v1p62vm40c.db \
+tef28hpcp16x32hd18_phrm_130a_ffg0p99v1p98vm40c.db \
+tef28hpcp32x32hd18_phrm_120a_tt0p9v1p8v25c.db \
+tef28hpcp16x32hd18_phrm_130a_ffg1p05v1p98v0c.db \
+tef28hpcp32x32hd18_phrm_120a_tt0p9v1p8v85c.db \
+tef28hpcp16x32hd18_phrm_130a_ffg1p05v1p98v125c.db \
+tef28hpcp64x32hd18_phrm_120a_ffg0p99v1p98v0c.db \
+tef28hpcp16x32hd18_phrm_130a_ffg1p05v1p98vm40c.db \
+tef28hpcp64x32hd18_phrm_120a_ffg0p99v1p98v125c.db \
+tef28hpcp16x32hd18_phrm_130a_ssg0p81v1p62v0c.db \
+tef28hpcp64x32hd18_phrm_120a_ffg0p99v1p98vm40c.db \
+tef28hpcp16x32hd18_phrm_130a_ssg0p81v1p62v125c.db \
+tef28hpcp64x32hd18_phrm_120a_ssg0p81v1p62v0c.db \
+tef28hpcp16x32hd18_phrm_130a_ssg0p81v1p62vm40c.db \
+tef28hpcp64x32hd18_phrm_120a_ssg0p81v1p62v125c.db \
+tef28hpcp16x32hd18_phrm_130a_ssg0p9v1p62v0c.db \
+tef28hpcp64x32hd18_phrm_120a_ssg0p81v1p62vm40c.db \
+tef28hpcp16x32hd18_phrm_130a_ssg0p9v1p62v125c.db \
+tef28hpcp64x32hd18_phrm_120a_tt0p9v1p8v25c.db \
+tef28hpcp16x32hd18_phrm_130a_ssg0p9v1p62vm40c.db \
+tef28hpcp64x32hd18_phrm_120a_tt0p9v1p8v85c.db \
+tef28hpcp16x32hd18_phrm_130a_tt0p9v1p8v25c.db \
+tef28hpcpesd_p_120a_ffg0p99v1p98v0c.db \
+tef28hpcp16x32hd18_phrm_130a_tt0p9v1p8v85c.db \
+tef28hpcpesd_p_120a_ffg0p99v1p98v125c.db \
+tef28hpcp16x32hd18_phrm_130a_tt1v1p8v25c.db \
+tef28hpcpesd_p_120a_ffg0p99v1p98vm40c.db \
+tef28hpcp16x32hd18_phrm_130a_tt1v1p8v85c.db \
+tef28hpcpesd_p_120a_ssg0p81v1p62v0c.db \
+tef28hpcp256x32hd18_phrm_120a_ffg0p99v1p98v0c.db \
+tef28hpcpesd_p_120a_ssg0p81v1p62v125c.db \
+tef28hpcp256x32hd18_phrm_120a_ffg0p99v1p98v125c.db \
+tef28hpcpesd_p_120a_ssg0p81v1p62vm40c.db \
+tef28hpcp256x32hd18_phrm_120a_ffg0p99v1p98vm40c.db \
+tef28hpcpesd_p_120a_tt0p9v1p8v25c.db \
+tef28hpcp256x32hd18_phrm_120a_ssg0p81v1p62v0c.db \
+tef28hpcpesd_p_120a_tt0p9v1p8v85c.db \
+tphn28hpcpgv18ffg0p99v1p98v0c.db \
+tphn28hpcpgv18ffg0p99v1p98vm40c.db \
+tphn28hpcpgv18ssg0p81v1p62v125c.db \
+tphn28hpcpgv18tt0p9v1p8v25c.db \
+tphn28hpcpgv18ffg0p99v1p98v125c.db \
+tphn28hpcpgv18ssg0p81v1p62v0c.db \
+tphn28hpcpgv18ssg0p81v1p62vm40c.db \
+tphn28hpcpgv18tt0p9v1p8v85c.db \
+TCITSMCN28HPCPGPMPLLA1.db \
+TCITSMCN28HPCPGPMPLLA1_FFX.db \
+TCITSMCN28HPCPGPMPLLA1_SSX.db \
+TCITSMCN28HPCPGPMPLLA1_FF.db \
+TCITSMCN28HPCPGPMPLLA1_SS.db \
+TCITSMCN28HPCPGPMPLLA1_TT.db \
+\
+RxPmdPma_lib.db \
+TxPmdPma_lib.db \
+rx1lane_lib.db \
+tx1lane_lib.db \
+rp_lpm_top_lib.db \
+rp_arp_top_lib.db \
+rp_sw_top_lib.db \
+rp_pp_egress_top_lib.db \
+rp_hpp_egress_top_lib.db \
+rp_pp_ingress_top_lib.db \
+rp_hpp_ingress_top_lib.db \
+rp_re_top_lib.db \
+eth_rx_top_lib.db \
+eth_tx_top_lib.db \
+rp_hi_top_lib.db \
+rp_hi_top_lib_ssg0p81v125c_cworst.db \
+eth_rx_top_lib_ssg0p81v125c_cworst.db \
+eth_tx_top_lib_ssg0p81v125c_cworst.db \
+sadglsph4s1p128x56m2b1w0c0p1d0r1s10_ppi.db \
+sadglsph4s1p256x56m2b2w0c0p1d0r1s10_ppi.db \
+sadglsph4s1p512x56m2b2w0c0p1d0r1s10_ppi.db \
+sad2lsph4s1p1024x144m4b1w0c1p1d0r1s10_arp.db \
+sad2lsph4s1p2048x144m4b4w0c1p1d0r1s10_pipe.db \
+sad2lsph4s1p4096x39m8b2w0c1p1d0r1s10_pipe.db \
+sad2lsph4s1p8192x39m8b8w0c1p1d0r1s10_pipe.db \
+sadglsph4s1p1024x144m2b2w0c1p1d0r1s10_pipe.db \
+sadglsph4s1p1024x18m4b2w0c0p1d0r1s10_ppi.db \
+sadglsph4s1p1024x39m4b1w0c0p1d0r1s10_arp.db \
+sadglsph4s1p1024x39m4b1w0c0p1d0r1s10_pipe.db \
+sadglsph4s1p1024x56m4b1w0c0p1d0r1s10_arp.db \
+sadglsph4s1p128x144m2b1w0c1p1d0r1s10_pipe.db \
+sadglsph4s1p128x39m4b1w0c0p1d0r1s10_pipe.db \
+sadglsph4s1p128x50m2b1w0c0p1d0r1s10_ppi.db \
+sadglsph4s1p16x144m2b1w0c1p1d0r1s10_pipe.db \
+sadglsph4s1p2048x39m4b2w0c0p1d0r1s10_pipe.db \
+sadglsph4s1p256x144m2b1w0c1p1d0r1s10_pipe.db \
+sadglsph4s1p256x39m4b1w0c0p1d0r1s10_pipe.db \
+sadglsph4s1p256x50m2b1w0c0p1d0r1s10_ppi.db \
+sadglsph4s1p32x144m2b1w0c1p1d0r1s10_pipe.db \
+sadglsph4s1p32x144m2b1w0c1p1d0r1s10_ppi.db \
+sadglsph4s1p32x18m2b1w0c0p1d0r1s10_ppi.db \
+sadglsph4s1p32x39m4b1w0c0p1d0r1s10_pipe.db \
+sadglsph4s1p512x144m2b1w0c1p1d0r1s10_pipe.db \
+sadglsph4s1p512x144m2b2w0c1p1d0r1s10_arp.db \
+sadglsph4s1p512x39m4b1w0c0p1d0r1s10_pipe.db \
+sadglsph4s1p512x39m4b1w0c1p1d0r1s10_arp.db \
+sadglsph4s1p512x50m4b1w0c0p1d0r1s10_ppi.db \
+sadglsph4s1p512x56m2b2w0c0p1d0r1s10_arp.db \
+sadglsph4s1p64x144m2b1w0c1p1d0r1s10_pipe.db \
+sadglsph4s1p64x39m4b1w0c0p1d0r1s10_pipe.db \
+sadglsph4s2p128x80m1b4w0c0p1d0r1s10_ethrx.db \
+sadglsph4s2p16x26m2b1w0c0p1d0r1s10_sw.db \
+sadglsph4s2p32x148m1b1w0c1p1d0r1s10_ethrx.db \
+sadglsph4s2p32x152m1b1w0c1p1d0r1s10_sw.db \
+sadglsph4s2p32x164m1b1w0c1p1d0r1s10_sw.db \
+sadglsph4s2p32x180m1b1w0c1p1d0r1s10_ethrx.db \
+sadulsph4s2p1024x144m4b4w0c1p1d0r1s10_ppi.db \
+sadulsph4s2p11264x18m16b4w0c1p1d0r1s10_re.db \
+sadulsph4s2p16384x18m16b8w0c1p1d0r1s10_re.db \
+sadulsph4s2p2048x20m8b1w0c0p1d0r1s10_sw.db \
+sadulsph4s2p2048x22m8b1w0c0p1d0r1s10_sw.db \
+sadulsph4s2p4096x76m8b4w0c1p1d0r1s10_sw.db \
+sadulsph4s2p64x151m4b1w0c1p1d0r1s10_sw.db \
+sadulsph4s2p768x144m4b2w0c1p1d0r1s10_ppi.db \
+sadulsph4s2p8192x20m16b2w0c1p1d0r1s10_sw.db \
+sadulsph4s2p8192x26m16b2w0c1p1d0r1s10_sw.db \
+sasrlsph4s1p64x72m2b1w0c1p1d0r1s10_txrx_fast.db \
+sasslsph4s1p16384x31m16b4w0c1p1d0r1s10_pipe_fast.db \
+sasslsph4s1p16384x39m16b4w0c1p1d0r1s10_pipe_fast.db \
+sasslsph4s1p16384x72m16b4w0c1p1d0r1s10_pipe_fast.db \
+sasslsph4s1p4096x144m8b2w0c1p1d0r1s10_pipe_fast.db \
+sasslsph4s1p8192x144m8b4w0c1p1d0r1s10_pipe_fast.db \
+\
+sad2lsph4s1p1024x144m4b1w0c1p1d0r1s10_arp_ssgwc0p81vn40c.db \
+sad2lsph4s1p2048x144m4b4w0c1p1d0r1s10_pipe_ssgwc0p81vn40c.db \
+sad2lsph4s1p4096x39m8b2w0c1p1d0r1s10_pipe_ssgwc0p81vn40c.db \
+sad2lsph4s1p8192x39m8b8w0c1p1d0r1s10_pipe_ssgwc0p81vn40c.db \
+sadglsph4s1p1024x144m2b2w0c1p1d0r1s10_pipe_ssgwc0p81vn40c.db \
+sadglsph4s1p1024x18m4b2w0c0p1d0r1s10_ppi_ssgwc0p81vn40c.db \
+sadglsph4s1p1024x39m4b1w0c0p1d0r1s10_arp_ssgwc0p81vn40c.db \
+sadglsph4s1p1024x39m4b1w0c0p1d0r1s10_pipe_ssgwc0p81vn40c.db \
+sadglsph4s1p1024x56m4b1w0c0p1d0r1s10_arp_ssgwc0p81vn40c.db \
+sadglsph4s1p128x144m2b1w0c1p1d0r1s10_pipe_ssgwc0p81vn40c.db \
+sadglsph4s1p128x39m4b1w0c0p1d0r1s10_pipe_ssgwc0p81vn40c.db \
+sadglsph4s1p128x50m2b1w0c0p1d0r1s10_ppi_ssgwc0p81vn40c.db \
+sadglsph4s1p128x56m2b1w0c0p1d0r1s10_ppi_ssgwc0p81vn40c.db \
+sadglsph4s1p16x144m2b1w0c1p1d0r1s10_pipe_ssgwc0p81vn40c.db \
+sadglsph4s1p2048x39m4b2w0c0p1d0r1s10_pipe_ssgwc0p81vn40c.db \
+sadglsph4s1p256x144m2b1w0c1p1d0r1s10_pipe_ssgwc0p81vn40c.db \
+sadglsph4s1p256x39m4b1w0c0p1d0r1s10_pipe_ssgwc0p81vn40c.db \
+sadglsph4s1p256x50m2b1w0c0p1d0r1s10_ppi_ssgwc0p81vn40c.db \
+sadglsph4s1p256x56m2b2w0c0p1d0r1s10_ppi_ssgwc0p81vn40c.db \
+sadglsph4s1p32x144m2b1w0c1p1d0r1s10_pipe_ssgwc0p81vn40c.db \
+sadglsph4s1p32x144m2b1w0c1p1d0r1s10_ppi_ssgwc0p81vn40c.db \
+sadglsph4s1p32x18m2b1w0c0p1d0r1s10_ppi_ssgwc0p81vn40c.db \
+sadglsph4s1p32x39m4b1w0c0p1d0r1s10_pipe_ssgwc0p81vn40c.db \
+sadglsph4s1p512x144m2b1w0c1p1d0r1s10_pipe_ssgwc0p81vn40c.db \
+sadglsph4s1p512x144m2b2w0c1p1d0r1s10_arp_ssgwc0p81vn40c.db \
+sadglsph4s1p512x39m4b1w0c0p1d0r1s10_pipe_ssgwc0p81vn40c.db \
+sadglsph4s1p512x39m4b1w0c1p1d0r1s10_arp_ssgwc0p81vn40c.db \
+sadglsph4s1p512x50m4b1w0c0p1d0r1s10_ppi_ssgwc0p81vn40c.db \
+sadglsph4s1p512x56m2b2w0c0p1d0r1s10_arp_ssgwc0p81vn40c.db \
+sadglsph4s1p512x56m2b2w0c0p1d0r1s10_ppi_ssgwc0p81vn40c.db \
+sadglsph4s1p64x144m2b1w0c1p1d0r1s10_pipe_ssgwc0p81vn40c.db \
+sadglsph4s1p64x39m4b1w0c0p1d0r1s10_pipe_ssgwc0p81vn40c.db \
+sadglsph4s2p128x80m1b4w0c0p1d0r1s10_ethrx_ssgwc0p81vn40c.db \
+sadglsph4s2p16x26m2b1w0c0p1d0r1s10_sw_ssgwc0p81vn40c.db \
+sadglsph4s2p32x148m1b1w0c1p1d0r1s10_ethrx_ssgwc0p81vn40c.db \
+sadglsph4s2p32x152m1b1w0c1p1d0r1s10_sw_ssgwc0p81vn40c.db \
+sadglsph4s2p32x164m1b1w0c1p1d0r1s10_sw_ssgwc0p81vn40c.db \
+sadglsph4s2p32x180m1b1w0c1p1d0r1s10_ethrx_ssgwc0p81vn40c.db \
+sadulsph4s2p1024x144m4b4w0c1p1d0r1s10_ppi_ssgwc0p81vn40c.db \
+sadulsph4s2p11264x18m16b4w0c1p1d0r1s10_re_ssgwc0p81vn40c.db \
+sadulsph4s2p16384x18m16b8w0c1p1d0r1s10_re_ssgwc0p81vn40c.db \
+sadulsph4s2p2048x20m8b1w0c0p1d0r1s10_sw_ssgwc0p81vn40c.db \
+sadulsph4s2p2048x22m8b1w0c0p1d0r1s10_sw_ssgwc0p81vn40c.db \
+sadulsph4s2p4096x76m8b4w0c1p1d0r1s10_sw_ssgwc0p81vn40c.db \
+sadulsph4s2p64x151m4b1w0c1p1d0r1s10_sw_ssgwc0p81vn40c.db \
+sadulsph4s2p768x144m4b2w0c1p1d0r1s10_ppi_ssgwc0p81vn40c.db \
+sadulsph4s2p8192x20m16b2w0c1p1d0r1s10_sw_ssgwc0p81vn40c.db \
+sadulsph4s2p8192x26m16b2w0c1p1d0r1s10_sw_ssgwc0p81vn40c.db \
+sasrlsph4s1p64x72m2b1w0c1p1d0r1s10_txrx_fast_ssgwc0p81vn40c.db \
+sasslsph4s1p16384x31m16b4w0c1p1d0r1s10_pipe_fast_ssgwc0p81vn40c.db \
+sasslsph4s1p16384x39m16b4w0c1p1d0r1s10_pipe_fast_ssgwc0p81vn40c.db \
+sasslsph4s1p16384x72m16b4w0c1p1d0r1s10_pipe_fast_ssgwc0p81vn40c.db \
+sasslsph4s1p4096x144m8b2w0c1p1d0r1s10_pipe_fast_ssgwc0p81vn40c.db \
+sasslsph4s1p8192x144m8b4w0c1p1d0r1s10_pipe_fast_ssgwc0p81vn40c.db \
+\
+sad2lsph4s1p1024x144m4b1w0c1p1d0r1s10_arp_ffgbc0p99vn40c.db \
+sad2lsph4s1p2048x144m4b4w0c1p1d0r1s10_pipe_ffgbc0p99vn40c.db \
+sad2lsph4s1p4096x39m8b2w0c1p1d0r1s10_pipe_ffgbc0p99vn40c.db \
+sad2lsph4s1p8192x39m8b8w0c1p1d0r1s10_pipe_ffgbc0p99vn40c.db \
+sadglsph4s1p1024x144m2b2w0c1p1d0r1s10_pipe_ffgbc0p99vn40c.db \
+sadglsph4s1p1024x18m4b2w0c0p1d0r1s10_ppi_ffgbc0p99vn40c.db \
+sadglsph4s1p1024x39m4b1w0c0p1d0r1s10_arp_ffgbc0p99vn40c.db \
+sadglsph4s1p1024x39m4b1w0c0p1d0r1s10_pipe_ffgbc0p99vn40c.db \
+sadglsph4s1p1024x56m4b1w0c0p1d0r1s10_arp_ffgbc0p99vn40c.db \
+sadglsph4s1p128x144m2b1w0c1p1d0r1s10_pipe_ffgbc0p99vn40c.db \
+sadglsph4s1p128x39m4b1w0c0p1d0r1s10_pipe_ffgbc0p99vn40c.db \
+sadglsph4s1p128x50m2b1w0c0p1d0r1s10_ppi_ffgbc0p99vn40c.db \
+sadglsph4s1p128x56m2b1w0c0p1d0r1s10_ppi_ffgbc0p99vn40c.db \
+sadglsph4s1p16x144m2b1w0c1p1d0r1s10_pipe_ffgbc0p99vn40c.db \
+sadglsph4s1p2048x39m4b2w0c0p1d0r1s10_pipe_ffgbc0p99vn40c.db \
+sadglsph4s1p256x144m2b1w0c1p1d0r1s10_pipe_ffgbc0p99vn40c.db \
+sadglsph4s1p256x39m4b1w0c0p1d0r1s10_pipe_ffgbc0p99vn40c.db \
+sadglsph4s1p256x50m2b1w0c0p1d0r1s10_ppi_ffgbc0p99vn40c.db \
+sadglsph4s1p256x56m2b2w0c0p1d0r1s10_ppi_ffgbc0p99vn40c.db \
+sadglsph4s1p32x144m2b1w0c1p1d0r1s10_pipe_ffgbc0p99vn40c.db \
+sadglsph4s1p32x144m2b1w0c1p1d0r1s10_ppi_ffgbc0p99vn40c.db \
+sadglsph4s1p32x18m2b1w0c0p1d0r1s10_ppi_ffgbc0p99vn40c.db \
+sadglsph4s1p32x39m4b1w0c0p1d0r1s10_pipe_ffgbc0p99vn40c.db \
+sadglsph4s1p512x144m2b1w0c1p1d0r1s10_pipe_ffgbc0p99vn40c.db \
+sadglsph4s1p512x144m2b2w0c1p1d0r1s10_arp_ffgbc0p99vn40c.db \
+sadglsph4s1p512x39m4b1w0c0p1d0r1s10_pipe_ffgbc0p99vn40c.db \
+sadglsph4s1p512x39m4b1w0c1p1d0r1s10_arp_ffgbc0p99vn40c.db \
+sadglsph4s1p512x50m4b1w0c0p1d0r1s10_ppi_ffgbc0p99vn40c.db \
+sadglsph4s1p512x56m2b2w0c0p1d0r1s10_arp_ffgbc0p99vn40c.db \
+sadglsph4s1p512x56m2b2w0c0p1d0r1s10_ppi_ffgbc0p99vn40c.db \
+sadglsph4s1p64x144m2b1w0c1p1d0r1s10_pipe_ffgbc0p99vn40c.db \
+sadglsph4s1p64x39m4b1w0c0p1d0r1s10_pipe_ffgbc0p99vn40c.db \
+sadglsph4s2p128x80m1b4w0c0p1d0r1s10_ethrx_ffgbc0p99vn40c.db \
+sadglsph4s2p16x26m2b1w0c0p1d0r1s10_sw_ffgbc0p99vn40c.db \
+sadglsph4s2p32x148m1b1w0c1p1d0r1s10_ethrx_ffgbc0p99vn40c.db \
+sadglsph4s2p32x152m1b1w0c1p1d0r1s10_sw_ffgbc0p99vn40c.db \
+sadglsph4s2p32x164m1b1w0c1p1d0r1s10_sw_ffgbc0p99vn40c.db \
+sadglsph4s2p32x180m1b1w0c1p1d0r1s10_ethrx_ffgbc0p99vn40c.db \
+sadulsph4s2p1024x144m4b4w0c1p1d0r1s10_ppi_ffgbc0p99vn40c.db \
+sadulsph4s2p11264x18m16b4w0c1p1d0r1s10_re_ffgbc0p99vn40c.db \
+sadulsph4s2p16384x18m16b8w0c1p1d0r1s10_re_ffgbc0p99vn40c.db \
+sadulsph4s2p2048x20m8b1w0c0p1d0r1s10_sw_ffgbc0p99vn40c.db \
+sadulsph4s2p2048x22m8b1w0c0p1d0r1s10_sw_ffgbc0p99vn40c.db \
+sadulsph4s2p4096x76m8b4w0c1p1d0r1s10_sw_ffgbc0p99vn40c.db \
+sadulsph4s2p64x151m4b1w0c1p1d0r1s10_sw_ffgbc0p99vn40c.db \
+sadulsph4s2p768x144m4b2w0c1p1d0r1s10_ppi_ffgbc0p99vn40c.db \
+sadulsph4s2p8192x20m16b2w0c1p1d0r1s10_sw_ffgbc0p99vn40c.db \
+sadulsph4s2p8192x26m16b2w0c1p1d0r1s10_sw_ffgbc0p99vn40c.db \
+sasrlsph4s1p64x72m2b1w0c1p1d0r1s10_txrx_fast_ffgbc0p99vn40c.db \
+sasslsph4s1p16384x31m16b4w0c1p1d0r1s10_pipe_fast_ffgbc0p99vn40c.db \
+sasslsph4s1p16384x39m16b4w0c1p1d0r1s10_pipe_fast_ffgbc0p99vn40c.db \
+sasslsph4s1p16384x72m16b4w0c1p1d0r1s10_pipe_fast_ffgbc0p99vn40c.db \
+sasslsph4s1p4096x144m8b2w0c1p1d0r1s10_pipe_fast_ffgbc0p99vn40c.db \
+sasslsph4s1p8192x144m8b4w0c1p1d0r1s10_pipe_fast_ffgbc0p99vn40c.db \
+\
+sad2lsph4s1p1024x144m4b1w0c1p1d0r1s10_arp_ffgbc0p99v125c.db \
+sad2lsph4s1p2048x144m4b4w0c1p1d0r1s10_pipe_ffgbc0p99v125c.db \
+sad2lsph4s1p4096x39m8b2w0c1p1d0r1s10_pipe_ffgbc0p99v125c.db \
+sad2lsph4s1p8192x39m8b8w0c1p1d0r1s10_pipe_ffgbc0p99v125c.db \
+sadglsph4s1p1024x144m2b2w0c1p1d0r1s10_pipe_ffgbc0p99v125c.db \
+sadglsph4s1p1024x18m4b2w0c0p1d0r1s10_ppi_ffgbc0p99v125c.db \
+sadglsph4s1p1024x39m4b1w0c0p1d0r1s10_arp_ffgbc0p99v125c.db \
+sadglsph4s1p1024x39m4b1w0c0p1d0r1s10_pipe_ffgbc0p99v125c.db \
+sadglsph4s1p1024x56m4b1w0c0p1d0r1s10_arp_ffgbc0p99v125c.db \
+sadglsph4s1p128x144m2b1w0c1p1d0r1s10_pipe_ffgbc0p99v125c.db \
+sadglsph4s1p128x39m4b1w0c0p1d0r1s10_pipe_ffgbc0p99v125c.db \
+sadglsph4s1p128x50m2b1w0c0p1d0r1s10_ppi_ffgbc0p99v125c.db \
+sadglsph4s1p128x56m2b1w0c0p1d0r1s10_ppi_ffgbc0p99v125c.db \
+sadglsph4s1p16x144m2b1w0c1p1d0r1s10_pipe_ffgbc0p99v125c.db \
+sadglsph4s1p2048x39m4b2w0c0p1d0r1s10_pipe_ffgbc0p99v125c.db \
+sadglsph4s1p256x144m2b1w0c1p1d0r1s10_pipe_ffgbc0p99v125c.db \
+sadglsph4s1p256x39m4b1w0c0p1d0r1s10_pipe_ffgbc0p99v125c.db \
+sadglsph4s1p256x50m2b1w0c0p1d0r1s10_ppi_ffgbc0p99v125c.db \
+sadglsph4s1p256x56m2b2w0c0p1d0r1s10_ppi_ffgbc0p99v125c.db \
+sadglsph4s1p32x144m2b1w0c1p1d0r1s10_pipe_ffgbc0p99v125c.db \
+sadglsph4s1p32x144m2b1w0c1p1d0r1s10_ppi_ffgbc0p99v125c.db \
+sadglsph4s1p32x18m2b1w0c0p1d0r1s10_ppi_ffgbc0p99v125c.db \
+sadglsph4s1p32x39m4b1w0c0p1d0r1s10_pipe_ffgbc0p99v125c.db \
+sadglsph4s1p512x144m2b1w0c1p1d0r1s10_pipe_ffgbc0p99v125c.db \
+sadglsph4s1p512x144m2b2w0c1p1d0r1s10_arp_ffgbc0p99v125c.db \
+sadglsph4s1p512x39m4b1w0c0p1d0r1s10_pipe_ffgbc0p99v125c.db \
+sadglsph4s1p512x39m4b1w0c1p1d0r1s10_arp_ffgbc0p99v125c.db \
+sadglsph4s1p512x50m4b1w0c0p1d0r1s10_ppi_ffgbc0p99v125c.db \
+sadglsph4s1p512x56m2b2w0c0p1d0r1s10_arp_ffgbc0p99v125c.db \
+sadglsph4s1p512x56m2b2w0c0p1d0r1s10_ppi_ffgbc0p99v125c.db \
+sadglsph4s1p64x144m2b1w0c1p1d0r1s10_pipe_ffgbc0p99v125c.db \
+sadglsph4s1p64x39m4b1w0c0p1d0r1s10_pipe_ffgbc0p99v125c.db \
+sadglsph4s2p128x80m1b4w0c0p1d0r1s10_ethrx_ffgbc0p99v125c.db \
+sadglsph4s2p16x26m2b1w0c0p1d0r1s10_sw_ffgbc0p99v125c.db \
+sadglsph4s2p32x148m1b1w0c1p1d0r1s10_ethrx_ffgbc0p99v125c.db \
+sadglsph4s2p32x152m1b1w0c1p1d0r1s10_sw_ffgbc0p99v125c.db \
+sadglsph4s2p32x164m1b1w0c1p1d0r1s10_sw_ffgbc0p99v125c.db \
+sadglsph4s2p32x180m1b1w0c1p1d0r1s10_ethrx_ffgbc0p99v125c.db \
+sadulsph4s2p1024x144m4b4w0c1p1d0r1s10_ppi_ffgbc0p99v125c.db \
+sadulsph4s2p11264x18m16b4w0c1p1d0r1s10_re_ffgbc0p99v125c.db \
+sadulsph4s2p16384x18m16b8w0c1p1d0r1s10_re_ffgbc0p99v125c.db \
+sadulsph4s2p2048x20m8b1w0c0p1d0r1s10_sw_ffgbc0p99v125c.db \
+sadulsph4s2p2048x22m8b1w0c0p1d0r1s10_sw_ffgbc0p99v125c.db \
+sadulsph4s2p4096x76m8b4w0c1p1d0r1s10_sw_ffgbc0p99v125c.db \
+sadulsph4s2p64x151m4b1w0c1p1d0r1s10_sw_ffgbc0p99v125c.db \
+sadulsph4s2p768x144m4b2w0c1p1d0r1s10_ppi_ffgbc0p99v125c.db \
+sadulsph4s2p8192x20m16b2w0c1p1d0r1s10_sw_ffgbc0p99v125c.db \
+sadulsph4s2p8192x26m16b2w0c1p1d0r1s10_sw_ffgbc0p99v125c.db \
+sasrlsph4s1p64x72m2b1w0c1p1d0r1s10_txrx_fast_ffgbc0p99v125c.db \
+sasslsph4s1p16384x31m16b4w0c1p1d0r1s10_pipe_fast_ffgbc0p99v125c.db \
+sasslsph4s1p16384x39m16b4w0c1p1d0r1s10_pipe_fast_ffgbc0p99v125c.db \
+sasslsph4s1p16384x72m16b4w0c1p1d0r1s10_pipe_fast_ffgbc0p99v125c.db \
+sasslsph4s1p4096x144m8b2w0c1p1d0r1s10_pipe_fast_ffgbc0p99v125c.db \
+sasslsph4s1p8192x144m8b4w0c1p1d0r1s10_pipe_fast_ffgbc0p99v125c.db \
+dwc_xaui6g_x1_ns_9m6x2z_ssg0p81v125c_rcworst.db \
+dwc_xaui6g_x1_ns_9m6x2z_ssg0p81v125c_rcbest.db \
+dwc_xaui6g_x1_ns_9m6x2z_ssg0p81v125c_cbest.db \
+dwc_xaui6g_x1_ns_9m6x2z_ssg0p81v125c_cworst.db \
+dwc_xaui6g_x1_ns_9m6x2z_ssg0p81vn40c_rcbest.db \
+dwc_xaui6g_x1_ns_9m6x2z_ssg0p81vn40c_rcworst.db \
+dwc_xaui6g_x1_ns_9m6x2z_ssg0p81vn40c_cbest.db \
+dwc_xaui6g_x1_ns_9m6x2z_ssg0p81vn40c_cworst.db \
+dwc_xaui6g_x1_ns_9m6x2z_ffg0p99v125c_rcbest.db \
+dwc_xaui6g_x1_ns_9m6x2z_ffg0p99v125c_rcworst.db \
+dwc_xaui6g_x1_ns_9m6x2z_ffg0p99v125c_cbest.db \
+dwc_xaui6g_x1_ns_9m6x2z_ffg0p99v125c_cworst.db \
+dwc_xaui6g_x1_ns_9m6x2z_ffg0p99vn40c_rcworst.db \
+dwc_xaui6g_x1_ns_9m6x2z_ffg0p99vn40c_rcbest.db \
+dwc_xaui6g_x1_ns_9m6x2z_ffg0p99vn40c_cbest.db \
+dwc_xaui6g_x1_ns_9m6x2z_ffg0p99vn40c_cworst.db \
+dwc_xaui6g_pads_x1_ns_9m6x2z_ffg0p99vn40c_rcbest.db \
+dwc_xaui6g_pads_x1_ns_9m6x2z_ffg0p99vn40c_rcworst.db \
+dwc_xaui6g_pads_x1_ns_9m6x2z_ffg0p99vn40c_cbest.db \
+dwc_xaui6g_pads_x1_ns_9m6x2z_ffg0p99vn40c_cworst.db \
+dwc_xaui6g_pads_x1_ns_9m6x2z_ffg0p99v125c_rcbest.db \
+dwc_xaui6g_pads_x1_ns_9m6x2z_ffg0p99v125c_rcworst.db \
+dwc_xaui6g_pads_x1_ns_9m6x2z_ffg0p99v125c_cworst.db \
+dwc_xaui6g_pads_x1_ns_9m6x2z_ffg0p99v125c_cbest.db \
+dwc_xaui6g_pads_x1_ns_9m6x2z_ssg0p81v125c_rcbest.db \
+dwc_xaui6g_pads_x1_ns_9m6x2z_ssg0p81v125c_rcworst.db \
+dwc_xaui6g_pads_x1_ns_9m6x2z_ssg0p81v125c_cworst.db \
+dwc_xaui6g_pads_x1_ns_9m6x2z_ssg0p81v125c_cbest.db \
+dwc_xaui6g_pads_x1_ns_9m6x2z_ssg0p81vn40c_rcbest.db \
+dwc_xaui6g_pads_x1_ns_9m6x2z_ssg0p81vn40c_rcworst.db \
+dwc_xaui6g_pads_x1_ns_9m6x2z_ssg0p81vn40c_cworst.db \
+dwc_xaui6g_pads_x1_ns_9m6x2z_ssg0p81vn40c_cbest.db \
+                                 "  ;#  Extra link logical libraries not included in TARGET_LIBRARY_FILES
+
+set MIN_LIBRARY_FILES             ""  ;#  List of max min library pairs "max1 min1 max2 min2 max3 min3"...
+
+set MW_REFERENCE_LIB_DIRS         " \
+                                  $ASTRO_DIR/tcbn28hpcplusbwp12t30p140  \
+                                  $ASTRO_DIR/tcbn28hpcplusbwp12t30p140hvt  \
+                                  $ASTRO_DIR/tcbn28hpcplusbwp12t30p140lvt \
+                                  $ASTRO_DIR/sw_mem  \
+                                  $ASTRO_DIR/re_mem  \
+                                  $ASTRO_DIR/ppi_mem  \
+                                  $ASTRO_DIR/arp_mem  \
+                                  $ASTRO_DIR/eth_mem  \
+                                  $ASTRO_DIR/LPM_MEM  \
+                                  $ASTRO_DIR/TxPmdPma_1.mem \
+                                  $ASTRO_DIR/RxPmdPma_1.mem \
+                                  $ASTRO_DIR/pll_mem \
+                                  $ASTRO_DIR/tphn28hpcpgv18 \
+                                  $ASTRO_DIR/tef28hpcp128x32hd18_phrm_120a \
+                                  $ASTRO_DIR/hi.mem \
+                                  $ASTRO_DIR/tef28hpcp16x32hd18_phrm_130a \
+                                  $ASTRO_DIR/tef28hpcp256x32hd18_phrm_120a \
+                                  $ASTRO_DIR/tef28hpcp32x32hd18_phrm_120a \
+                                  $ASTRO_DIR/tef28hpcp64x32hd18_phrm_120a \
+                                  $ASTRO_DIR/tef28hpcpesd_p_120a \
+                                  $ASTRO_DIR/rx1lane_03012017 \
+                                  $ASTRO_DIR/tx1lane_5_12.mem \
+                                  $ASTRO_DIR/rp_arp_top_LIB \
+                                  $ASTRO_DIR/rp_hpp_egress_top_LIB \
+                                  $ASTRO_DIR/rp_lpm_top_LIB \
+                                  $ASTRO_DIR/rp_pp_ingress_top_LIB \
+                                  $ASTRO_DIR/rp_sw_top_LIB \
+                                  $ASTRO_DIR/rp_hi_top_LIB \
+                                  $ASTRO_DIR/rp_hpp_ingress_top_LIB \
+                                  $ASTRO_DIR/rp_pp_egress_top_LIB \
+                                  $ASTRO_DIR/rp_re_top_LIB \
+                                  $ASTRO_DIR/eth_rx_top_LIB \
+                                  $ASTRO_DIR/eth_tx_top_LIB \
+                                  $ASTRO_DIR/rx12port_spacer.mem \
+                                  $ASTRO_DIR/tx12port_spacer.mem \
+                                  $ASTRO_DIR/wire_bond.mem \
+                                  $ASTRO_DIR/tpbn28v_fc_lf_lm \
+                                  $ASTRO_DIR/tpbn28v_fc_lf_bu \
+                                  $ASTRO_DIR/pad_fc80_LIB \
+                                  $ASTRO_DIR/OVL_M1_OD_CO_PO_V_N28_20160225 \
+                                  $ASTRO_DIR/sun_light1SealRing.mem \
+                                  $ASTRO_DIR/OVL_M1_OD_CO_PO_H_N28_20160225 \
+				  $ASTRO_DIR/BEOL_small_FDM1_20110323 \
+                                  $ASTRO_DIR/BEOL_small_FDM2_20110323 \
+                                  $ASTRO_DIR/BEOL_small_FDM3_20110323 \
+                                  $ASTRO_DIR/BEOL_small_FDM4_20110323 \
+                                  $ASTRO_DIR/BEOL_small_FDM5_20110323 \
+                                  $ASTRO_DIR/BEOL_small_FDM6_20110323 \
+                                  $ASTRO_DIR/BEOL_small_FDM7_20110323 \
+				   $ASTRO_DIR/N28_DMY_TCD_FH_20100614 \
+                                $ASTRO_DIR/N28_DMY_TCD_FV_20100614 \
+
+
+                                  "  ;#  Milkyway reference libraries 
+
+set MW_REFERENCE_CONTROL_FILE     ""  ;#  Reference Control file to define the Milkyway reference libs
+
+set TECH_FILE                     "$ASTRO_DIR/tsmcn28_9lm6X2ZUTRDL.tf"  ;#  Milkyway technology file
+set MAP_FILE                      "$TLUPLUS_DIR/tech2itf.map"  ;#  Mapping file for TLUplus
+set TLUPLUS_MAX_FILE              "$TLUPLUS_DIR/cworst_T.TLUP"  ;#  Max TLUplus file
+set TLUPLUS_MIN_FILE              "$TLUPLUS_DIR/cbest.TLUP"  ;#  Min TLUplus file
+
+set MIN_ROUTING_LAYER            "M1"   ;# Min routing layer
+set MAX_ROUTING_LAYER            "M7"   ;# Max routing layer
+
+set LIBRARY_DONT_USE_FILE        "$TCL_DIR/library_dont_use.tcl"   ;# Tcl file with library modifications for dont_use
+
+##########################################################################################
+# Multivoltage Common Variables
+#
+# Define the following multivoltage common variables for the reference methodology scripts 
+# for multivoltage flows. 
+# Use as few or as many of the following definitions as needed by your design.
+##########################################################################################
+
+set PD1                          ""           ;# Name of power domain/voltage area  1
+set VA1_COORDINATES              {}           ;# Coordinates for voltage area 1
+set MW_POWER_NET1                "VDD1"       ;# Power net for voltage area 1
+
+set PD2                          ""           ;# Name of power domain/voltage area  2
+set VA2_COORDINATES              {}           ;# Coordinates for voltage area 2
+set MW_POWER_NET2                "VDD2"       ;# Power net for voltage area 2
+
+set PD3                          ""           ;# Name of power domain/voltage area  3
+set VA3_COORDINATES              {}           ;# Coordinates for voltage area 3
+set MW_POWER_NET3                "VDD3"       ;# Power net for voltage area 3
+
+set PD4                          ""           ;# Name of power domain/voltage area  4
+set VA4_COORDINATES              {}           ;# Coordinates for voltage area 4
+set MW_POWER_NET4                "VDD4"       ;# Power net for voltage area 4
+
+puts "RM-Info: Completed script [info script]\n"
+

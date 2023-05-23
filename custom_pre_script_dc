@@ -1,0 +1,54 @@
+###############
+## SIZE_ONLY ##
+###############
+
+set_size_only -all_instances [get_cells rx_lane_gen[0].u_gate_clk_xsbi]
+set_size_only -all_instances [get_cells rx_lane_gen[1].u_gate_clk_xsbi]
+set_size_only -all_instances [get_cells rx_lane_gen[2].u_gate_clk_xsbi]
+set_size_only -all_instances [get_cells rx_lane_gen[3].u_gate_clk_xsbi]
+set_size_only -all_instances [get_cells u_gate_clk_xlgmii]
+set_size_only -all_instances [get_cells u_gate_clk_xsbi]
+set_size_only -all_instances [get_cells u_gate_clk_xlgmii]
+
+set_size_only -all_instances [get_cells -hier *u_clk_gate]
+set_size_only -all_instances [get_cells -hier *inst_CKLNQD12BWP12T30P140_a]
+set_size_only -all_instances [get_cells -hier *inst_CKLNQD12BWP12T30P140_b]
+set_size_only -all_instances [get_cells -hier *inst0_CKND12BWP12T30P140]
+set_size_only -all_instances [get_cells -hier *inst1_CKND12BWP12T30P140]
+set_size_only -all_instances [get_cells -hier *inst0_CKND2D8BWP12T30P140]
+
+
+
+###############
+## DONT_SCAN ##
+###############
+
+set_scan_element false [get_cells u_gate_clk_xsbi ]
+set_scan_element false [get_cells u_gate_clk_xlgmii ]
+set_scan_element false [get_cells rx_lane_gen[0]/u_gate_clk_xsbi ]
+set_scan_element false [get_cells rx_lane_gen[1]/u_gate_clk_xsbi ]
+set_scan_element false [get_cells rx_lane_gen[2]/u_gate_clk_xsbi ]
+set_scan_element false [get_cells rx_lane_gen[3]/u_gate_clk_xsbi ]
+set_scan_element false [get_cells u_gate_clk_xlgmii ]
+set_scan_element false [get_cells -hier *u_clk_gate ]
+set_scan_element false [get_cells -hier *inst_CKLNQD12BWP12T30P140_a ]
+set_scan_element false [get_cells -hier *inst_CKLNQD12BWP12T30P140_b ]
+set_scan_element false [get_cells -hier *inst0_CKND12BWP12T30P140 ]
+set_scan_element false [get_cells -hier *inst1_CKND12BWP12T30P140 ]
+set_scan_element false [get_cells -hier *inst0_CKND2D8BWP12T30P140 ]
+
+
+# set_clock_gating_style
+set_clock_gating_style  -sequential_cell latch -control_signal scan_enable -control_point before -max_fanout 2048 -positive_edge_logic integrated -negative_edge_logic integrated -minimum_bitwidth 8
+set case_analysis_propagate_through_icg  true
+
+# allow constants to propagate
+set compile_seqmap_propagate_constants          true
+set compile_seqmap_propagate_high_effort        true
+
+# remove unloaded flops
+set compile_delete_unloaded_sequential_cells    true
+
+# don't preserve all sequentials
+set hdlin_preserve_sequential                   false
+

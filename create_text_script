@@ -1,0 +1,38 @@
+
+foreach_in_collection my_port [get_ports *] {
+set my_origin [get_attribute [get_ports $my_port] center]
+set my_name [get_attribute [get_ports $my_port] name]
+set my_layer [get_attribute [get_ports $my_port] layer]
+
+if {$my_layer eq "M2"} {
+create_text -origin  $my_origin -layer TEXT2 -height 0.1 $my_name
+}
+
+if {$my_layer eq "M3"} {
+create_text -origin  $my_origin -layer TEXT3 -height 0.1 -orient E $my_name
+}
+
+if {$my_layer eq "M4"} {
+create_text -origin  $my_origin -layer TEXT4 -height 0.1 $my_name
+}
+
+if {$my_layer eq "M5"} {
+create_text -origin  $my_origin -layer TEXT5 -height 0.1 -orient E $my_name
+}
+
+if {$my_layer eq "M6"} {
+create_text -origin  $my_origin -layer TEXT6 -height 0.1 $my_name
+}
+
+}
+
+foreach_in_collection powerterminal [get_terminals {VDD VSS}] {
+set powerterminalowner_port [get_attribute $powerterminal name]
+set bblx [get_attribute $powerterminal bbox_llx]
+set bbly [get_attribute $powerterminal bbox_lly]
+set bbux [get_attribute $powerterminal bbox_urx]
+set bbuy [get_attribute $powerterminal bbox_ury]
+set bbx [expr ($bblx+$bbux)/2]
+set bby [expr ($bbly+$bbuy)/2]
+create_text -origin  "$bbx $bby" -layer TEXT8 -height 0.1 $powerterminalowner_port
+}

@@ -1,0 +1,110 @@
+##ICC RM Makefile
+##See README.* file for RM details
+
+
+ICC_EXEC = icc_shell -64bit
+LOGS_DIR     = ../logs
+REPORTS_DIR = ../rpts
+RESULTS_DIR = ../work
+PNA_OUTPUT_DIR = ../work/pna_output
+
+####Source Options
+OPTIONS = 
+
+
+
+##Optional: Specify design library if you want backup step and clean step to use it
+##CAUTION: if added, the clean step will delete it
+DESIGN_LIB = 
+
+
+##########################################################################################################################
+# Flat floorplanning script execution section
+# Execute "make dp" to run ICC Design Planning RM based on your common_setup.tcl, icc_setup.tcl
+##########################################################################################################################
+
+
+init_design_icc: 
+	mkdir -p $(REPORTS_DIR) $(RESULTS_DIR) $(LOGS_DIR)/init_design_icc
+	$(ICC_EXEC) $(OPTIONS) -f ../../scripts_block/rm_icc_scripts/init_design_icc.tcl | tee -i $(LOGS_DIR)/init_design_icc/init_design_icc.log
+	date > init_design_icc
+
+flat_dp: init_design_icc
+	mkdir -p $(REPORTS_DIR) $(RESULTS_DIR) $(LOGS_DIR)/flat_dp
+	$(ICC_EXEC) $(OPTIONS) -f ../../scripts_block/rm_icc_dp_scripts/flat_dp.tcl | tee -i $(LOGS_DIR)/flat_dp/flat_dp.log
+	date > flat_dp
+
+dp: flat_dp 
+	date > dp
+
+
+################################################################################################################
+# ICC RM : netlist2gds script exection section
+# Execute "make ic" to run IC Compiler based on your common_setup.tcl & icc_setup.tcl files
+# If make dp has been run before, please pick one of the 8 created floorplans and fill that one in the 
+# variable ICC_FLOORPLAN_CEL in the icc_setup.tcl file
+################################################################################################################
+
+
+place_opt_icc: init_design_icc
+	mkdir -p $(REPORTS_DIR) $(RESULTS_DIR) $(LOGS_DIR)/place_opt_icc
+	$(ICC_EXEC) $(OPTIONS) -f ../../scripts_block/rm_icc_scripts/place_opt_icc.tcl |tee -i $(LOGS_DIR)/place_opt_icc/place_opt_icc.log
+	date > place_opt_icc
+
+clock_opt_cts_icc: place_opt_icc
+	mkdir -p $(REPORTS_DIR) $(RESULTS_DIR) $(LOGS_DIR)/clock_opt_cts_icc
+	$(ICC_EXEC) $(OPTIONS) -f ../../scripts_block/rm_icc_scripts/clock_opt_cts_icc.tcl |tee -i $(LOGS_DIR)/clock_opt_cts_icc/clock_opt_cts_icc.log
+	date > clock_opt_cts_icc
+
+clock_opt_psyn_icc: clock_opt_cts_icc
+	mkdir -p $(REPORTS_DIR) $(RESULTS_DIR) $(LOGS_DIR)/clock_opt_psyn_icc
+	$(ICC_EXEC) $(OPTIONS) -f ../../scripts_block/rm_icc_zrt_scripts/clock_opt_psyn_icc.tcl |tee -i $(LOGS_DIR)/clock_opt_psyn_icc/clock_opt_psyn_icc.log
+	date > clock_opt_psyn_icc
+
+clock_opt_route_icc: clock_opt_psyn_icc
+	mkdir -p $(REPORTS_DIR) $(RESULTS_DIR) $(LOGS_DIR)/clock_opt_route_icc
+	$(ICC_EXEC) $(OPTIONS) -f ../../scripts_block/rm_icc_zrt_scripts/clock_opt_route_icc.tcl |tee -i $(LOGS_DIR)/clock_opt_route_icc/clock_opt_route_icc.log
+	date > clock_opt_route_icc
+
+route_icc: clock_opt_route_icc
+	mkdir -p $(REPORTS_DIR) $(RESULTS_DIR) $(LOGS_DIR)/route_icc
+	$(ICC_EXEC) $(OPTIONS) -f ../../scripts_block/rm_icc_zrt_scripts/route_icc.tcl |tee -i $(LOGS_DIR)/route_icc/route_icc.log
+	date > route_icc
+
+ic: route_icc
+	date > ic
+
+################################################################################################################
+# ICC RM : Eco flow
+################################################################################################################
+eco_icc: 
+	mkdir -p $(REPORTS_DIR) $(RESULTS_DIR) $(LOGS_DIR)/eco_icc
+	$(ICC_EXEC) $(OPTIONS) -f ../../scripts_block/rm_icc_zrt_scripts/eco_icc.tcl |tee -i $(LOGS_DIR)/eco_icc/eco_icc.log
+	date > eco_icc
+
+eco: eco_icc
+	date > eco
+
+#############################################################################################################################
+# Utilities Section
+#
+#############################################################################################################################
+
+
+##Backup
+BACKUP  = BACKUP.`date "+%m_%d_%H_%M"`
+backup:
+	rm -rf $(BACKUP)
+	mkdir -p $(BACKUP)
+	cp -rf ../../scripts_block/rm_icc_scripts ../../scripts_block/rm_icc_zrt_scripts ../../scripts_block/rm_icc_dp_scripts ../../scripts_block/rm_setup $(DESIGN_LIB) $(REPORTS_DIR) $(RESULTS_DIR) $(LOGS_DIR) $(PNA_OUTPUT_DIR) $(BACKUP)
+
+
+##Clean
+
+clean_all:
+	rm  -f init_design_icc flat_dp dp init_design_icc_dp place_opt_icc clock_opt_cts_icc clock_opt_psyn_icc clock_opt_route_icc route_icc ic
+	rm -rf $(DESIGN_LIB) $(LOGS_DIR) $(RESULTS_DIR)/*sbpf* $(RESULTS_DIR)/*.def $(RESULTS_DIR)/*pg*  $(REPORTS_DIR)/place* $(REPORTS_DIR)/clock* $(REPORTS_DIR)/route* $(REPORTS_DIR)/sign* $(REPORTS_DIR)/chip*  *_map\.* \
+               net.acts *.attr .zr* Milkyway.cmd.*_*_*_* Milkyway.log.*_*_*_* \.vers* port_mapping.* pna_output
+	##ICC_RM-Info: "make clean" does not remove the design library unless you have specified it with the DESIGN_LIB variable in Makefile"
+
+clean: clean_all
